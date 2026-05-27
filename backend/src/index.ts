@@ -12,6 +12,8 @@ import userRouter from './routes/user';
 import organizationRouter from './routes/organization';
 import integrationRouter from './routes/integration';
 import billingRouter from './routes/billing';
+import analyticsRouter from './routes/analytics';
+import studentsRouter from './routes/students';
 
 dotenv.config();
 
@@ -30,6 +32,8 @@ app.use('/api/user', userRouter);
 app.use('/api/org', organizationRouter);
 app.use('/api/integrations', integrationRouter);
 app.use('/api/billing', billingRouter);
+app.use('/api/analytics', analyticsRouter);
+app.use('/api/students', studentsRouter);
 
 // Initialize DB and Server
 async function startServer() {

@@ -1,10 +1,80 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Topbar from '@/components/Topbar';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Play } from 'lucide-react';
+import { api } from '@/lib/api';
+import { toast } from '@/components/Toaster';
 
 export default function AnalyticsPage() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAnalytics = async () => {
+    try {
+      const res = await api.getAnalytics();
+      setData(res);
+    } catch (error) {
+      console.error('Failed to load analytics', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnalytics();
+
+    // Establish WebSocket for real-time updates
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+    const wsUrl = API_URL.replace('http', 'ws').replace('/api', '');
+    const ws = new WebSocket(wsUrl);
+
+    ws.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload.type === 'analytics_updated') {
+          // Re-fetch data in real-time without page reload!
+          fetchAnalytics();
+        }
+      } catch (err) {}
+    };
+
+    return () => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+    };
+  }, []);
+
+  const handleSeed = async () => {
+    try {
+      setLoading(true);
+      await api.seedAnalytics();
+      toast.success('Successfully seeded real-time data!');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to seed');
+    }
+  };
+
+  if (loading && !data) {
+    return (
+      <div className="h-full flex flex-col pb-4">
+        <Topbar title="Analytics" showBack={true} />
+        <div className="flex-1 flex items-center justify-center bg-[#eef0f3] ml-[11px] mr-4 rounded-[16px]">
+          <span className="text-gray-500 font-bold">Loading real-time analytics...</span>
+        </div>
+      </div>
+    );
+  }
+
+  const { totalSubmissions, expectedSubmissions, averageScore, topScore, classMedian, lowestScore, grades, missedConcepts, recommendedActions, maxScore } = data || {};
+  const arcPercentage = totalSubmissions > 0 ? (totalSubmissions / expectedSubmissions) * 100 : 0;
+  // Calculate arc end point (SVG math)
+  // Arc goes from 180 deg to 0 deg. (pi to 0 rad). 100% is 0 deg.
+  const angle = Math.PI - (arcPercentage / 100) * Math.PI;
+  const arcX = 50 + 40 * Math.cos(angle);
+  const arcY = 50 - 40 * Math.sin(angle);
+
   return (
     <div className="h-full flex flex-col pb-4">
       <Topbar title="Analytics" showBack={true} />
@@ -18,7 +88,12 @@ export default function AnalyticsPage() {
             
             {/* Overall Class Performance Summary */}
             <section>
-              <h2 className="text-center text-[18px] font-bold text-[#333] mb-4">Overall Class Performance Summary</h2>
+              <div className="flex items-center justify-between mb-4 px-2">
+                <h2 className="text-[18px] font-bold text-[#333]">Overall Class Performance Summary</h2>
+                <button onClick={handleSeed} className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold text-[11px] px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shadow-sm">
+                  <Play className="w-3.5 h-3.5" /> Simulate Real-time Submissions
+                </button>
+              </div>
               
               <div className="flex flex-col md:flex-row gap-4">
                 
@@ -30,13 +105,13 @@ export default function AnalyticsPage() {
                     {/* Background Arc */}
                     <svg className="absolute top-0 left-0 w-full h-full overflow-hidden" viewBox="0 0 100 50" preserveAspectRatio="xMidYMax meet">
                       <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#3d3d3d" strokeWidth="7" strokeLinecap="round" />
-                      {/* Foreground Arc (90%) -> 45/50 */}
-                      <path d="M 10 50 A 40 40 0 0 1 88.04 37.64" fill="none" stroke="#ff512f" strokeWidth="7" strokeLinecap="round" />
+                      {/* Foreground Arc */}
+                      <path d={`M 10 50 A 40 40 0 0 1 ${arcX} ${arcY}`} fill="none" stroke="#ff512f" strokeWidth="7" strokeLinecap="round" className="transition-all duration-1000 ease-out" />
                     </svg>
                     <div className="absolute bottom-0 flex flex-col items-center w-full translate-y-2">
                       <div className="flex items-baseline gap-1">
-                        <span className="text-[34px] font-black leading-none tracking-tighter text-white">45</span>
-                        <span className="text-[14px] text-gray-300 font-medium">/ 50</span>
+                        <span className="text-[34px] font-black leading-none tracking-tighter text-white">{totalSubmissions || 0}</span>
+                        <span className="text-[14px] text-gray-300 font-medium">/ {expectedSubmissions || 50}</span>
                       </div>
                       <span className="text-[11px] text-gray-400 font-medium mt-1">Submissions</span>
                     </div>
@@ -58,21 +133,21 @@ export default function AnalyticsPage() {
                 {/* Metrics Grid */}
                 <div className="grid grid-cols-2 gap-4 flex-1">
                   <div className="bg-white rounded-[24px] flex flex-col items-center justify-center p-6 shadow-sm">
-                    <span className="text-[42px] font-black text-[#13c656] tracking-tighter">82%</span>
+                    <span className="text-[42px] font-black text-[#13c656] tracking-tighter transition-all">{averageScore || 0}%</span>
                     <span className="text-[14px] font-semibold text-[#4f4f4f] mt-1">Average Score</span>
                   </div>
                   <div className="bg-white rounded-[24px] flex flex-col items-center justify-center p-6 shadow-sm">
-                    <span className="text-[42px] font-black text-[#ff6230] tracking-tighter">95%</span>
+                    <span className="text-[42px] font-black text-[#ff6230] tracking-tighter transition-all">{topScore || 0}%</span>
                     <span className="text-[14px] font-semibold text-[#4f4f4f] mt-1">TopScore</span>
                   </div>
                   <div className="bg-white rounded-[24px] flex flex-col items-center justify-center p-6 shadow-sm">
-                    <span className="text-[42px] font-black text-[#1a1a1a] tracking-tighter">
-                      20<span className="text-[24px] text-gray-400">/25</span>
+                    <span className="text-[42px] font-black text-[#1a1a1a] tracking-tighter transition-all">
+                      {classMedian || 0}<span className="text-[24px] text-gray-400">/{maxScore || 25}</span>
                     </span>
                     <span className="text-[14px] font-semibold text-[#4f4f4f] mt-1">Class Median</span>
                   </div>
                   <div className="bg-white rounded-[24px] flex flex-col items-center justify-center p-6 shadow-sm">
-                    <span className="text-[42px] font-black text-[#9ca3af] tracking-tighter">40%</span>
+                    <span className="text-[42px] font-black text-[#9ca3af] tracking-tighter transition-all">{lowestScore || 0}%</span>
                     <span className="text-[14px] font-semibold text-[#4f4f4f] mt-1">Lowest Score</span>
                   </div>
                 </div>
@@ -91,23 +166,23 @@ export default function AnalyticsPage() {
                 <div className="flex justify-between items-end gap-3">
                   <div className="bg-[#48c774] rounded-[16px] text-white flex flex-col items-center justify-center py-6 px-4 flex-1 shadow-md">
                     <span className="text-[42px] font-black leading-none mb-2">A</span>
-                    <span className="text-[13px] font-medium leading-tight">12</span>
+                    <span className="text-[13px] font-medium leading-tight">{grades?.A || 0}</span>
                     <span className="text-[12px] font-medium leading-tight">Students</span>
                   </div>
                   <div className="bg-[#f2c94c] rounded-[16px] text-white flex flex-col items-center justify-center py-6 px-4 flex-1 shadow-md">
                     <span className="text-[42px] font-black leading-none mb-2">B</span>
-                    <span className="text-[13px] font-medium leading-tight">15</span>
+                    <span className="text-[13px] font-medium leading-tight">{grades?.B || 0}</span>
                     <span className="text-[12px] font-medium leading-tight">Students</span>
                   </div>
                   <div className="bg-[#f2994a] rounded-[16px] text-white flex flex-col items-center justify-center py-6 px-4 flex-1 shadow-md">
                     <span className="text-[42px] font-black leading-none mb-2">C</span>
-                    <span className="text-[13px] font-medium leading-tight">13</span>
+                    <span className="text-[13px] font-medium leading-tight">{grades?.C || 0}</span>
                     <span className="text-[12px] font-medium leading-tight">Students</span>
                   </div>
                   <div className="bg-[#d96570] rounded-[16px] text-white flex flex-col items-center justify-center py-6 px-4 flex-1 shadow-md">
                     <span className="text-[12px] font-bold mb-1 tracking-wider opacity-90">Below</span>
                     <span className="text-[42px] font-black leading-none mb-2">D</span>
-                    <span className="text-[13px] font-medium leading-tight">10</span>
+                    <span className="text-[13px] font-medium leading-tight">{grades?.D || 0}</span>
                     <span className="text-[12px] font-medium leading-tight">Students</span>
                   </div>
                 </div>
@@ -134,58 +209,41 @@ export default function AnalyticsPage() {
             <h2 className="text-[18px] font-bold text-[#333] pl-2">Learning Gaps Analysis</h2>
             
             {/* Frequently Missed Concepts */}
-            <div className="bg-white rounded-[24px] p-6 shadow-sm">
+            <div className="bg-white rounded-[24px] p-6 shadow-sm min-h-[250px]">
               <h3 className="text-[16px] font-bold text-[#4f4f4f] mb-6">Frequently missed concepts</h3>
               
               <ul className="space-y-4">
-                <li className="flex justify-between items-center text-[14px] font-semibold text-[#333]">
-                  <span>1. Ohm's Law Application</span>
-                  <span className="text-[#eb5757]">23%</span>
-                </li>
-                <li className="flex justify-between items-center text-[14px] font-semibold text-[#333]">
-                  <span>2. Resistance in Parallel Circuits</span>
-                  <span className="text-[#eb5757]">18%</span>
-                </li>
-                <li className="flex justify-between items-center text-[14px] font-semibold text-[#333]">
-                  <span>3. Potential Difference and EMF</span>
-                  <span className="text-[#eb5757]">15%</span>
-                </li>
-                <li className="flex justify-between items-center text-[14px] font-semibold text-[#333]">
-                  <span>4. Interpreting Circuit Diagrams</span>
-                  <span className="text-[#eb5757]">12%</span>
-                </li>
-                <li className="flex justify-between items-center text-[14px] font-semibold text-[#333]">
-                  <span>5. Series vs Parallel Circuits</span>
-                  <span className="text-[#eb5757]">8%</span>
-                </li>
+                {missedConcepts?.length > 0 ? missedConcepts.map((item: any, i: number) => (
+                  <li key={i} className="flex justify-between items-center text-[14px] font-semibold text-[#333]">
+                    <span>{i + 1}. {item.concept}</span>
+                    <span className="text-[#eb5757]">{item.percentage}%</span>
+                  </li>
+                )) : (
+                  <div className="text-[14px] text-gray-400 font-medium italic mt-8 text-center">No missing concepts detected yet.</div>
+                )}
               </ul>
             </div>
 
             {/* Recommended Actions */}
-            <div className="bg-white rounded-[24px] p-6 shadow-sm">
+            <div className="bg-white rounded-[24px] p-6 shadow-sm min-h-[250px]">
               <h3 className="text-[16px] font-bold text-[#4f4f4f] mb-5">Recommended Actions for teachers</h3>
               
               <ul className="space-y-5 text-[13px] font-medium text-[#4f4f4f] leading-relaxed pr-2">
-                <li className="flex items-start gap-2">
-                  <span className="font-bold shrink-0">1.</span>
-                  <span><span className="font-bold text-[#333]">Simran Kaur</span> – Misinterprets series vs parallel logic; needs circuit-building demo.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-bold shrink-0">2.</span>
-                  <span><span className="font-bold text-[#333]">Revise in class : Ohm's Law</span> – Use real-life problem-solving (e.g., fan, heater)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-bold shrink-0">3.</span>
-                  <span><span className="font-bold text-[#333]">Concept of Power</span> – Clarify derivations and differences between formulas.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-bold shrink-0">4.</span>
-                  <span>Extra classes for students who scored less than D</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-bold shrink-0">5.</span>
-                  <span>Extra classes for students who scored less than D</span>
-                </li>
+                {recommendedActions?.length > 0 ? recommendedActions.map((action: string, i: number) => {
+                  // Bold the first part before the dash for styling
+                  const parts = action.split('–');
+                  return (
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="font-bold shrink-0">{i + 1}.</span>
+                      <span>
+                        <span className="font-bold text-[#333]">{parts[0]}</span> 
+                        {parts.length > 1 ? `– ${parts.slice(1).join('–')}` : ''}
+                      </span>
+                    </li>
+                  );
+                }) : (
+                  <div className="text-[14px] text-gray-400 font-medium italic mt-8 text-center">More submissions needed to generate recommendations.</div>
+                )}
               </ul>
             </div>
           </div>

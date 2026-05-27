@@ -38,13 +38,33 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
-// List all assignments
+// List all active assignments
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const assignments = await Assignment.find().sort({ createdAt: -1 });
+    const assignments = await Assignment.find({ isDeleted: { $ne: true }, isArchived: { $ne: true } }).sort({ createdAt: -1 });
     res.json(assignments);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch assignments' });
+  }
+});
+
+// List all archived assignments
+router.get('/settings/archives', async (req: Request, res: Response) => {
+  try {
+    const assignments = await Assignment.find({ isArchived: true, isDeleted: { $ne: true } }).sort({ createdAt: -1 });
+    res.json(assignments);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch archived assignments' });
+  }
+});
+
+// List all deleted assignments (bin)
+router.get('/settings/bin', async (req: Request, res: Response) => {
+  try {
+    const assignments = await Assignment.find({ isDeleted: true }).sort({ createdAt: -1 });
+    res.json(assignments);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch deleted assignments' });
   }
 });
 
@@ -78,17 +98,56 @@ router.put('/:id', async (req: Request, res: Response) => {
   }
 });
 
-// Delete specific assignment
+// Soft delete specific assignment
 router.delete('/:id', async (req: Request, res: Response) => {
+    try {
+      const assignment = await Assignment.findByIdAndUpdate(req.params.id, { isDeleted: true });
+      if (!assignment) {
+        return res.status(404).json({ error: 'Assignment not found' });
+      }
+      res.json({ message: 'Assignment moved to bin' });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to delete assignment' });
+    }
+});
+
+// Archive specific assignment
+router.put('/:id/archive', async (req: Request, res: Response) => {
+    try {
+      const assignment = await Assignment.findByIdAndUpdate(req.params.id, { isArchived: true, isDeleted: false });
+      if (!assignment) {
+        return res.status(404).json({ error: 'Assignment not found' });
+      }
+      res.json({ message: 'Assignment archived' });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to archive assignment' });
+    }
+});
+
+// Restore specific assignment
+router.put('/:id/restore', async (req: Request, res: Response) => {
+    try {
+      const assignment = await Assignment.findByIdAndUpdate(req.params.id, { isArchived: false, isDeleted: false });
+      if (!assignment) {
+        return res.status(404).json({ error: 'Assignment not found' });
+      }
+      res.json({ message: 'Assignment restored' });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to restore assignment' });
+    }
+});
+
+// Permanently delete specific assignment
+router.delete('/:id/permanent', async (req: Request, res: Response) => {
     try {
       const assignment = await Assignment.findByIdAndDelete(req.params.id);
       if (!assignment) {
         return res.status(404).json({ error: 'Assignment not found' });
       }
-      res.json({ message: 'Assignment deleted' });
+      res.json({ message: 'Assignment permanently deleted' });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to delete assignment' });
+      res.status(500).json({ error: 'Failed to permanently delete assignment' });
     }
-  });
+});
 
 export default router;

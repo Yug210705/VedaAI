@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5001/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
 export const api = {
   getAssignments: async () => {
@@ -43,6 +43,36 @@ export const api = {
     return res.json();
   },
 
+  archiveAssignment: async (id: string) => {
+    const res = await fetch(`${API_URL}/assignments/${id}/archive`, { method: 'PUT' });
+    if (!res.ok) throw new Error('Failed to archive assignment');
+    return res.json();
+  },
+
+  restoreAssignment: async (id: string) => {
+    const res = await fetch(`${API_URL}/assignments/${id}/restore`, { method: 'PUT' });
+    if (!res.ok) throw new Error('Failed to restore assignment');
+    return res.json();
+  },
+
+  permanentDeleteAssignment: async (id: string) => {
+    const res = await fetch(`${API_URL}/assignments/${id}/permanent`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to permanently delete assignment');
+    return res.json();
+  },
+
+  getArchivedAssignments: async () => {
+    const res = await fetch(`${API_URL}/assignments/settings/archives`);
+    if (!res.ok) throw new Error('Failed to fetch archived assignments');
+    return res.json();
+  },
+
+  getDeletedAssignments: async () => {
+    const res = await fetch(`${API_URL}/assignments/settings/bin`);
+    if (!res.ok) throw new Error('Failed to fetch deleted assignments');
+    return res.json();
+  },
+
   // generateAIPaper and saveGeneratedAssignment removed in favor of background queue flow
 
   // Classes
@@ -77,6 +107,36 @@ export const api = {
   deleteClass: async (id: string) => {
     const res = await fetch(`${API_URL}/classes/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Failed to delete class');
+    return res.json();
+  },
+  
+  archiveClass: async (id: string) => {
+    const res = await fetch(`${API_URL}/classes/${id}/archive`, { method: 'PUT' });
+    if (!res.ok) throw new Error('Failed to archive class');
+    return res.json();
+  },
+
+  restoreClass: async (id: string) => {
+    const res = await fetch(`${API_URL}/classes/${id}/restore`, { method: 'PUT' });
+    if (!res.ok) throw new Error('Failed to restore class');
+    return res.json();
+  },
+
+  permanentDeleteClass: async (id: string) => {
+    const res = await fetch(`${API_URL}/classes/${id}/permanent`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to permanently delete class');
+    return res.json();
+  },
+
+  getArchivedClasses: async () => {
+    const res = await fetch(`${API_URL}/classes/settings/archives`);
+    if (!res.ok) throw new Error('Failed to fetch archived classes');
+    return res.json();
+  },
+
+  getDeletedClasses: async () => {
+    const res = await fetch(`${API_URL}/classes/settings/bin`);
+    if (!res.ok) throw new Error('Failed to fetch deleted classes');
     return res.json();
   },
   
@@ -137,8 +197,18 @@ export const api = {
     return res.json();
   },
   deleteTeamMember: async (id: string) => {
-    const res = await fetch(`${API_URL}/user/team/${id}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error('Failed to delete member');
+    const res = await fetch(`${API_URL}/org/team/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to remove team member');
+    return res.json();
+  },
+  getAnalytics: async () => {
+    const res = await fetch(`${API_URL}/analytics`);
+    if (!res.ok) throw new Error('Failed to fetch analytics');
+    return res.json();
+  },
+  seedAnalytics: async () => {
+    const res = await fetch(`${API_URL}/analytics/seed`, { method: 'POST' });
+    if (!res.ok) throw new Error('Failed to seed analytics');
     return res.json();
   },
 
@@ -212,6 +282,36 @@ export const api = {
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error('Failed to update user');
+    return res.json();
+  },
+
+  // Students
+  getStudents: async () => {
+    const res = await fetch(`${API_URL}/students`);
+    if (!res.ok) throw new Error('Failed to fetch students');
+    return res.json();
+  },
+  createStudent: async (data: any) => {
+    const res = await fetch(`${API_URL}/students`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to create student');
+    return res.json();
+  },
+  updateStudent: async (id: string, data: any) => {
+    const res = await fetch(`${API_URL}/students/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to update student');
+    return res.json();
+  },
+  deleteStudent: async (id: string) => {
+    const res = await fetch(`${API_URL}/students/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to delete student');
     return res.json();
   }
 };

@@ -5,11 +5,15 @@ import { broadcast } from '../websocket';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 const pdf = require('pdf-parse');
 
-const redisConnection = new IORedis({
-  host: process.env.REDIS_HOST || '127.0.0.1',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  maxRetriesPerRequest: null,
-});
+const redisOptions: any = { maxRetriesPerRequest: null };
+const redisConnection = process.env.REDIS_URL
+  ? new IORedis(process.env.REDIS_URL, redisOptions)
+  : new IORedis({
+      host: process.env.REDIS_HOST || '127.0.0.1',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+      password: process.env.REDIS_PASSWORD,
+      maxRetriesPerRequest: null,
+    });
 
 export const generationQueue = new Queue('generationQueue', { connection: redisConnection });
 

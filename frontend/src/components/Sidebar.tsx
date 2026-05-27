@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { 
   Settings,
   Sparkles,
@@ -17,7 +18,8 @@ import {
   Smartphone,
   Grid3X3,
   Calendar,
-  Bookmark
+  Bookmark,
+  Users
 } from 'lucide-react';
 import clsx from 'clsx';
 import { toast } from '@/components/Toaster';
@@ -57,15 +59,17 @@ export default function Sidebar() {
   const navItems: any[] = [
     { name: 'Home', href: '/', iconImg: homeImg.src },
     { name: 'My Classes', href: '/classes', iconImg: mygroupImg.src },
+    { name: 'Students', href: '/students', icon: Users },
     { name: 'Assignments', href: '/assignments', iconImg: assignmentsImg.src },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'My Library', href: '/library', iconImg: mylibraryImg.src },
+    { name: 'AI Toolkit', href: '/toolkit', iconImg: toolkitImg.src, badge: 'NEW' },
   ];
 
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col justify-between w-[280px] h-[calc(100vh-24px)] m-[12px] bg-white rounded-[24px] p-[20px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-gray-100 z-10 shrink-0">
+      <aside className="hidden md:flex print:hidden flex-col justify-between w-[280px] h-[calc(100vh-24px)] m-[12px] bg-white rounded-[24px] p-[20px] shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-gray-100 z-10 shrink-0">
         <div className="flex flex-col w-full gap-[40px]">
           
           {/* Logo & Button Group */}
@@ -81,44 +85,61 @@ export default function Sidebar() {
             </div>
 
             {/* Create Button */}
-            <Link href="/assignments/create" className="block w-full mt-2">
-              <div className="w-full bg-[#1c1c1c] rounded-full px-4 py-3.5 flex items-center justify-center gap-2 text-white font-semibold text-[13px] hover:bg-black transition-all shadow-[0_4px_14px_rgba(0,0,0,0.25)] border-[1.5px] border-[#333]">
-                <Sparkles className="w-4 h-4 text-white" />
-                Create Assignment
-              </div>
-            </Link>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Link href="/assignments/create" className="block w-full mt-2">
+                <div className="w-full bg-[#1c1c1c] rounded-full px-4 py-3.5 flex items-center justify-center gap-2 text-white font-semibold text-[13px] hover:bg-black transition-all shadow-[0_4px_14px_rgba(0,0,0,0.25)] border-[1.5px] border-[#333]">
+                  <Sparkles className="w-4 h-4 text-white" />
+                  Create Assignment
+                </div>
+              </Link>
+            </motion.div>
           </div>
 
           {/* Navigation Menu */}
-          <nav className="flex flex-col gap-1 w-full">
-            {navItems.map((item) => {
+          <nav className="flex flex-col gap-1 w-full relative">
+            {navItems.map((item, index) => {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
               
               return (
-                <Link 
-                  key={item.name} 
-                  href={item.href}
-                  className={clsx(
-                    "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all font-semibold text-[13px]",
-                    isActive 
-                      ? "bg-[#f3f4f6] text-[#1a1a1a]" 
-                      : "text-[#6b7280] hover:bg-gray-50 hover:text-[#1a1a1a]"
-                  )}
+                <motion.div
+                  key={item.name}
+                  initial={{ opacity: 0, x: -15 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05, type: 'spring', stiffness: 300, damping: 24 }}
+                  className="relative w-full"
                 >
-                  <div className="flex items-center gap-3">
-                    {item.iconImg ? (
-                      <img src={item.iconImg} alt={item.name} className={clsx("w-[18px] h-[18px] object-contain", isActive ? "opacity-100" : "opacity-40 grayscale")} />
-                    ) : (
-                      item.icon && <item.icon className={clsx("w-[18px] h-[18px]", isActive ? "text-[#1a1a1a]" : "text-[#6b7280]")} />
-                    )}
-                    {item.name}
-                  </div>
-                  {item.badge && (
-                    <span className="bg-[#ff512f] text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wide shrink-0">
-                      {item.badge}
-                    </span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebar-active-pill"
+                      className="absolute inset-0 bg-[#f3f4f6] rounded-xl"
+                      initial={false}
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                    />
                   )}
-                </Link>
+                  <Link 
+                    href={item.href}
+                    className={clsx(
+                      "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all font-semibold text-[13px] relative z-10",
+                      isActive 
+                        ? "text-[#1a1a1a]" 
+                        : "text-[#6b7280] hover:bg-gray-50 hover:text-[#1a1a1a]"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      {item.iconImg ? (
+                        <img src={item.iconImg} alt={item.name} className={clsx("w-[18px] h-[18px] object-contain transition-all duration-300", isActive ? "opacity-100 scale-110" : "opacity-40 grayscale")} />
+                      ) : (
+                        item.icon && <item.icon className={clsx("w-[18px] h-[18px] transition-all duration-300", isActive ? "text-[#1a1a1a] scale-110" : "text-[#6b7280]")} />
+                      )}
+                      {item.name}
+                    </div>
+                    {item.badge && (
+                      <span className="bg-[#ff512f] text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wide shrink-0">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                </motion.div>
               );
             })}
           </nav>
@@ -153,17 +174,21 @@ export default function Sidebar() {
       </aside>
 
       {/* Mobile Floating Action Button (FAB) */}
-      <div className="md:hidden fixed bottom-[100px] right-5 z-[60]">
+      <div className="md:hidden print:hidden fixed bottom-[100px] right-5 z-[60]">
         <Link href="/assignments/create" className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-100">
           <Plus className="w-5 h-5 text-[#ff6230]" strokeWidth={2} />
         </Link>
       </div>
 
       {/* Mobile Navigation Bar */}
-      <div className="md:hidden fixed bottom-4 left-3 right-3 bg-[#1a1a1a] text-gray-400 flex justify-around items-center px-1 py-2.5 rounded-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.3)] z-[60]">
+      <div className="md:hidden print:hidden fixed bottom-4 left-3 right-3 bg-[#1a1a1a] text-gray-400 flex justify-around items-center px-1 py-2.5 rounded-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.3)] z-[60]">
         <Link href="/" className={clsx("flex flex-col items-center gap-1 w-14", pathname === '/' ? "text-white" : "text-[#888] hover:text-gray-300")}>
           <Grid3X3 className="w-[18px] h-[18px]" />
           <span className="text-[9px] font-bold tracking-wide">Home</span>
+        </Link>
+        <Link href="/students" className={clsx("flex flex-col items-center gap-1 w-14", pathname === '/students' ? "text-white" : "text-[#888] hover:text-gray-300")}>
+          <Users className="w-[18px] h-[18px]" />
+          <span className="text-[9px] font-bold tracking-wide">Students</span>
         </Link>
         <Link href="/assignments" className={clsx("flex flex-col items-center gap-1 w-14", (pathname.includes('/assignments') && !pathname.includes('create')) ? "text-white" : "text-[#888] hover:text-gray-300")}>
           <Calendar className="w-[18px] h-[18px]" />

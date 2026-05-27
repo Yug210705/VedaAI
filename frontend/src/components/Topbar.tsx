@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Grid3X3, Bell, ChevronDown, HelpCircle, Settings, LogOut, User, Mail, Search, MessageSquare, Shield, Smartphone, Menu } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { toast } from '@/components/Toaster';
 import Modal from '@/components/Modal';
@@ -85,7 +86,8 @@ export default function Topbar({ title, showBack = false }: TopbarProps) {
         </div>
         <div className="flex items-center gap-4">
           <div className="relative" ref={mobileNotifRef}>
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
               onClick={() => { setIsNotifOpen(!isNotifOpen); setIsProfileOpen(false); }}
               className="relative p-1"
             >
@@ -93,58 +95,74 @@ export default function Topbar({ title, showBack = false }: TopbarProps) {
               {notifications.filter(n => !n.read).length > 0 && (
                 <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-[#ff6230] rounded-full border-2 border-white box-content"></span>
               )}
-            </button>
+            </motion.button>
             {/* Mobile Notif Dropdown */}
-            {isNotifOpen && (
-              <div className="absolute right-0 mt-2 w-[280px] bg-white rounded-[20px] shadow-[0_8px_40px_rgba(0,0,0,0.12)] border border-gray-100 py-3 z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="px-4 pb-2 border-b border-gray-100 flex justify-between items-center">
-                  <h3 className="font-bold text-[#1a1a1a]">Notifications</h3>
-                  <span onClick={async () => { await api.markNotificationsRead(); fetchData(); }} className="text-[11px] font-bold text-[#ff6230] bg-orange-50 px-2 py-1 rounded-md cursor-pointer hover:bg-orange-100 transition-colors">Mark all read</span>
-                </div>
-                <div className="flex flex-col max-h-[250px] overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <div className="p-4 text-center text-sm text-gray-500">No notifications</div>
-                  ) : notifications.map((n) => (
-                    <div key={n._id || n.id} className={clsx("px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer flex gap-3 border-b border-gray-50 last:border-0", !n.read && "bg-orange-50/30")}>
-                      <div className={clsx("w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5", n.type === 'success' ? 'bg-green-50' : 'bg-blue-50')}>
-                        {n.type === 'success' ? <User className="w-4 h-4 text-green-500" /> : <Grid3X3 className="w-4 h-4 text-blue-500" />}
+            <AnimatePresence>
+              {isNotifOpen && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  className="absolute right-0 mt-2 w-[280px] bg-white rounded-[20px] shadow-[0_8px_40px_rgba(0,0,0,0.12)] border border-gray-100 py-3 z-[100]"
+                >
+                  <div className="px-4 pb-2 border-b border-gray-100 flex justify-between items-center">
+                    <h3 className="font-bold text-[#1a1a1a]">Notifications</h3>
+                    <span onClick={async () => { await api.markNotificationsRead(); fetchData(); }} className="text-[11px] font-bold text-[#ff6230] bg-orange-50 px-2 py-1 rounded-md cursor-pointer hover:bg-orange-100 transition-colors">Mark all read</span>
+                  </div>
+                  <div className="flex flex-col max-h-[250px] overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-4 text-center text-sm text-gray-500">No notifications</div>
+                    ) : notifications.map((n) => (
+                      <div key={n._id || n.id} className={clsx("px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer flex gap-3 border-b border-gray-50 last:border-0", !n.read && "bg-orange-50/30")}>
+                        <div className={clsx("w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5", n.type === 'success' ? 'bg-green-50' : 'bg-blue-50')}>
+                          {n.type === 'success' ? <User className="w-4 h-4 text-green-500" /> : <Grid3X3 className="w-4 h-4 text-blue-500" />}
+                        </div>
+                        <div>
+                          <p className="text-[12px] text-[#1a1a1a] font-medium leading-tight">{n.title} <span className="font-bold">{n.description}</span></p>
+                          <p className="text-[10px] text-gray-500 mt-1">{new Date(n.timestamp).toLocaleDateString()}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[12px] text-[#1a1a1a] font-medium leading-tight">{n.title} <span className="font-bold">{n.description}</span></p>
-                        <p className="text-[10px] text-gray-500 mt-1">{new Date(n.timestamp).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           <div className="relative" ref={mobileProfileRef}>
-            <button onClick={() => { setIsProfileOpen(!isProfileOpen); setIsNotifOpen(false); }} className="w-[28px] h-[28px] rounded-full overflow-hidden border-[1.5px] border-white shadow-sm flex shrink-0">
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => { setIsProfileOpen(!isProfileOpen); setIsNotifOpen(false); }} className="w-[28px] h-[28px] rounded-full overflow-hidden border-[1.5px] border-white shadow-sm flex shrink-0">
               <img src={user?.avatarUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=Default"} alt="avatar" className="w-full h-full object-cover" />
-            </button>
+            </motion.button>
             {/* Mobile Profile Dropdown */}
-            {isProfileOpen && (
-              <div className="absolute right-0 mt-2 w-52 bg-white rounded-[20px] shadow-[0_8px_40px_rgba(0,0,0,0.12)] border border-gray-100 py-2 z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
-                <Link href="/profile" onClick={() => setIsProfileOpen(false)}>
-                  <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-[#1a1a1a] font-semibold text-[13px] cursor-pointer">
-                    <User className="w-4 h-4 text-gray-500" strokeWidth={2.5} /> My Profile
-                  </div>
-                </Link>
-                <button onClick={() => { setIsProfileOpen(false); setIsSettingsOpen(true); }} className="w-full text-left">
-                  <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-[#1a1a1a] font-semibold text-[13px] cursor-pointer">
-                    <Settings className="w-4 h-4 text-gray-500" strokeWidth={2.5} /> Settings
-                  </div>
-                </button>
-                <div className="h-[1px] bg-gray-100 my-1 mx-3"></div>
-                <Link href="/" onClick={() => { setIsProfileOpen(false); toast.success('Logged out successfully'); }}>
-                  <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 transition-colors text-red-600 font-semibold text-[13px] cursor-pointer">
-                    <LogOut className="w-4 h-4 text-red-500" strokeWidth={2.5} /> Log Out
-                  </div>
-                </Link>
-              </div>
-            )}
+            <AnimatePresence>
+              {isProfileOpen && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  className="absolute right-0 mt-2 w-52 bg-white rounded-[20px] shadow-[0_8px_40px_rgba(0,0,0,0.12)] border border-gray-100 py-2 z-[100]"
+                >
+                  <Link href="/profile" onClick={() => setIsProfileOpen(false)}>
+                    <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-[#1a1a1a] font-semibold text-[13px] cursor-pointer">
+                      <User className="w-4 h-4 text-gray-500" strokeWidth={2.5} /> My Profile
+                    </div>
+                  </Link>
+                  <button onClick={() => { setIsProfileOpen(false); setIsSettingsOpen(true); }} className="w-full text-left">
+                    <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-[#1a1a1a] font-semibold text-[13px] cursor-pointer">
+                      <Settings className="w-4 h-4 text-gray-500" strokeWidth={2.5} /> Settings
+                    </div>
+                  </button>
+                  <div className="h-[1px] bg-gray-100 my-1 mx-3"></div>
+                  <Link href="/" onClick={() => { setIsProfileOpen(false); toast.success('Logged out successfully'); }}>
+                    <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 transition-colors text-red-600 font-semibold text-[13px] cursor-pointer">
+                      <LogOut className="w-4 h-4 text-red-500" strokeWidth={2.5} /> Log Out
+                    </div>
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -176,7 +194,8 @@ export default function Topbar({ title, showBack = false }: TopbarProps) {
         
         {/* Notifications Dropdown */}
         <div className="relative" ref={notifRef}>
-          <button 
+          <motion.button 
+            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
             onClick={() => {
               setIsNotifOpen(!isNotifOpen);
               setIsProfileOpen(false);
@@ -187,47 +206,56 @@ export default function Topbar({ title, showBack = false }: TopbarProps) {
             {notifications.filter(n => !n.read).length > 0 && (
               <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-orange-500 rounded-full border-2 border-white box-content"></span>
             )}
-          </button>
+          </motion.button>
           
-          {isNotifOpen && (
-            <div className="absolute right-0 mt-3 w-[320px] bg-white rounded-[20px] shadow-[0_8px_40px_rgba(0,0,0,0.12)] border border-gray-100 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-              <div className="px-5 pb-3 border-b border-gray-100 flex justify-between items-center">
-                <h3 className="font-bold text-[#1a1a1a]">Notifications</h3>
-                <span 
-                  onClick={async () => {
-                    await api.markNotificationsRead();
-                    fetchData();
-                  }}
-                  className="text-[11px] font-bold text-[#ff6230] bg-orange-50 px-2 py-1 rounded-md cursor-pointer hover:bg-orange-100 transition-colors"
-                >
-                  Mark all read
-                </span>
-              </div>
-              <div className="flex flex-col max-h-[300px] overflow-y-auto">
-                {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-sm text-gray-500">No notifications</div>
-                ) : notifications.map((n) => (
-                  <div key={n._id || n.id} className={clsx("px-5 py-3 hover:bg-gray-50 transition-colors cursor-pointer flex gap-3 border-b border-gray-50 last:border-0", !n.read && "bg-orange-50/30")}>
-                    <div className={clsx("w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5", n.type === 'success' ? 'bg-green-50' : 'bg-blue-50')}>
-                      {n.type === 'success' ? <User className="w-4 h-4 text-green-500" /> : <Grid3X3 className="w-4 h-4 text-blue-500" />}
+          <AnimatePresence>
+            {isNotifOpen && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                className="absolute right-0 mt-3 w-[320px] bg-white rounded-[20px] shadow-[0_8px_40px_rgba(0,0,0,0.12)] border border-gray-100 py-3 z-50"
+              >
+                <div className="px-5 pb-3 border-b border-gray-100 flex justify-between items-center">
+                  <h3 className="font-bold text-[#1a1a1a]">Notifications</h3>
+                  <span 
+                    onClick={async () => {
+                      await api.markNotificationsRead();
+                      fetchData();
+                    }}
+                    className="text-[11px] font-bold text-[#ff6230] bg-orange-50 px-2 py-1 rounded-md cursor-pointer hover:bg-orange-100 transition-colors"
+                  >
+                    Mark all read
+                  </span>
+                </div>
+                <div className="flex flex-col max-h-[300px] overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-gray-500">No notifications</div>
+                  ) : notifications.map((n) => (
+                    <div key={n._id || n.id} className={clsx("px-5 py-3 hover:bg-gray-50 transition-colors cursor-pointer flex gap-3 border-b border-gray-50 last:border-0", !n.read && "bg-orange-50/30")}>
+                      <div className={clsx("w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5", n.type === 'success' ? 'bg-green-50' : 'bg-blue-50')}>
+                        {n.type === 'success' ? <User className="w-4 h-4 text-green-500" /> : <Grid3X3 className="w-4 h-4 text-blue-500" />}
+                      </div>
+                      <div>
+                        <p className="text-[13px] text-[#1a1a1a] font-medium leading-tight">{n.title} <span className="font-bold">{n.description}</span></p>
+                        <p className="text-[11px] text-gray-500 mt-1">{new Date(n.timestamp).toLocaleDateString()}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[13px] text-[#1a1a1a] font-medium leading-tight">{n.title} <span className="font-bold">{n.description}</span></p>
-                      <p className="text-[11px] text-gray-500 mt-1">{new Date(n.timestamp).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="pt-2 px-5 text-center">
-                <span className="text-[12px] font-bold text-gray-500 hover:text-[#1a1a1a] cursor-pointer transition-colors">View all notifications</span>
-              </div>
-            </div>
-          )}
+                  ))}
+                </div>
+                <div className="pt-2 px-5 text-center">
+                  <span className="text-[12px] font-bold text-gray-500 hover:text-[#1a1a1a] cursor-pointer transition-colors">View all notifications</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         
         {/* Profile Dropdown */}
         <div className="relative" ref={profileRef}>
-          <button 
+          <motion.button 
+            whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
             onClick={() => {
               setIsProfileOpen(!isProfileOpen);
               setIsNotifOpen(false);
@@ -246,44 +274,52 @@ export default function Topbar({ title, showBack = false }: TopbarProps) {
             </div>
             <span className="text-[15px] font-bold text-gray-700">{user?.displayName || 'Loading...'}</span>
             <ChevronDown className={clsx("w-4 h-4 text-gray-400 transition-transform", isProfileOpen && "rotate-180")} />
-          </button>
+          </motion.button>
 
           {/* Dropdown Menu */}
-          {isProfileOpen && (
-            <div className="absolute right-0 mt-3 w-56 bg-white rounded-[20px] shadow-[0_8px_40px_rgba(0,0,0,0.12)] border border-gray-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-              <Link href="/profile" onClick={() => setIsProfileOpen(false)}>
-                <div className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors text-[#1a1a1a] font-semibold text-[13px] cursor-pointer">
-                  <User className="w-4 h-4 text-gray-500" strokeWidth={2.5} />
-                  My Profile
-                </div>
-              </Link>
-              <button 
-                onClick={() => {
-                  setIsProfileOpen(false);
-                  setIsSettingsOpen(true);
-                }}
-                className="w-full text-left"
+          <AnimatePresence>
+            {isProfileOpen && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                className="absolute right-0 mt-3 w-56 bg-white rounded-[20px] shadow-[0_8px_40px_rgba(0,0,0,0.12)] border border-gray-100 py-2 z-50"
               >
-                <div className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors text-[#1a1a1a] font-semibold text-[13px] cursor-pointer">
-                  <Settings className="w-4 h-4 text-gray-500" strokeWidth={2.5} />
-                  Settings
-                </div>
-              </button>
-              <div className="h-[1px] bg-gray-100 my-1 mx-4"></div>
-              <Link 
-                href="/" 
-                onClick={() => {
-                  setIsProfileOpen(false);
-                  toast.success('Logged out successfully');
-                }}
-              >
-                <div className="flex items-center gap-3 px-5 py-3 hover:bg-red-50 transition-colors text-red-600 font-semibold text-[13px] cursor-pointer">
-                  <LogOut className="w-4 h-4 text-red-500" strokeWidth={2.5} />
-                  Log Out
-                </div>
-              </Link>
-            </div>
-          )}
+                <Link href="/profile" onClick={() => setIsProfileOpen(false)}>
+                  <div className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors text-[#1a1a1a] font-semibold text-[13px] cursor-pointer">
+                    <User className="w-4 h-4 text-gray-500" strokeWidth={2.5} />
+                    My Profile
+                  </div>
+                </Link>
+                <button 
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    setIsSettingsOpen(true);
+                  }}
+                  className="w-full text-left"
+                >
+                  <div className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors text-[#1a1a1a] font-semibold text-[13px] cursor-pointer">
+                    <Settings className="w-4 h-4 text-gray-500" strokeWidth={2.5} />
+                    Settings
+                  </div>
+                </button>
+                <div className="h-[1px] bg-gray-100 my-1 mx-4"></div>
+                <Link 
+                  href="/" 
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    toast.success('Logged out successfully');
+                  }}
+                >
+                  <div className="flex items-center gap-3 px-5 py-3 hover:bg-red-50 transition-colors text-red-600 font-semibold text-[13px] cursor-pointer">
+                    <LogOut className="w-4 h-4 text-red-500" strokeWidth={2.5} />
+                    Log Out
+                  </div>
+                </Link>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </header>

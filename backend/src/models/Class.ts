@@ -7,6 +7,8 @@ export interface IClass extends Document {
   avgScore: string;
   activeTasks: number;
   color: string;
+  isArchived: boolean;
+  isDeleted: boolean;
   createdAt: Date;
 }
 
@@ -17,6 +19,8 @@ const ClassSchema: Schema = new Schema({
   avgScore: { type: String, default: '0%' },
   activeTasks: { type: Number, default: 0 },
   color: { type: String, default: 'bg-blue-500' },
+  isArchived: { type: Boolean, default: false },
+  isDeleted: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
 

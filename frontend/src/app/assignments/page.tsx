@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Topbar from '@/components/Topbar';
 import { Plus, Search, MoreVertical, ArrowLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 
@@ -87,7 +88,10 @@ export default function AssignmentsPage() {
           <div className="w-8 h-8 border-4 border-gray-300 border-t-orange-500 rounded-full animate-spin"></div>
         </div>
       ) : assignments.length === 0 ? (
-        <div className="flex-1 flex flex-col relative overflow-hidden">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          className="flex-1 flex flex-col relative overflow-hidden"
+        >
           <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 text-center pt-6 md:pt-8 pb-40 md:pb-8">
             {/* Custom Illustration */}
             <div className="relative w-[280px] h-[280px] mx-auto -mb-20 md:mb-2 -mt-28 md:-mt-10 transform scale-[0.45] md:scale-100 origin-center">
@@ -142,7 +146,7 @@ export default function AssignmentsPage() {
               </button>
             </Link>
           </div>
-        </div>
+        </motion.div>
       ) : (
         <div className="flex-1 flex flex-col relative overflow-hidden">
           
@@ -181,9 +185,24 @@ export default function AssignmentsPage() {
 
           {/* Assignments List */}
           <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-32 hide-scrollbar relative z-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            <motion.div 
+              initial="hidden" animate="show"
+              variants={{
+                hidden: { opacity: 0 },
+                show: { opacity: 1, transition: { staggerChildren: 0.08 } }
+              }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4"
+            >
               {assignments.map(a => (
-                <div key={a._id} className="bg-[#f8f9fa] rounded-[16px] md:rounded-[20px] p-3.5 px-4 md:p-5 shadow-sm border border-gray-100 flex flex-col relative gap-2 md:gap-3">
+                <motion.div 
+                  key={a._id} 
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 350, damping: 25 } }
+                  }}
+                  whileHover={{ y: -4, boxShadow: '0 12px 30px rgba(0,0,0,0.06)' }}
+                  className="bg-[#f8f9fa] rounded-[16px] md:rounded-[20px] p-3.5 px-4 md:p-5 shadow-sm border border-gray-100 flex flex-col relative gap-2 md:gap-3 cursor-pointer group"
+                >
                   <div className="flex justify-between items-start">
                     {editingId === a._id ? (
                       <input
@@ -216,6 +235,7 @@ export default function AssignmentsPage() {
                         <MoreVertical className="w-[18px] h-[18px]" strokeWidth={2.5} />
                       </button>
 
+                      <AnimatePresence>
                       {openDropdownId === a._id && (
                         <>
                           <div 
@@ -225,7 +245,13 @@ export default function AssignmentsPage() {
                               setOpenDropdownId(null);
                             }} 
                           />
-                          <div className="absolute right-0 top-8 w-44 bg-white rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-100 py-2 z-50 font-bold text-[13px] overflow-hidden">
+                          <motion.div 
+                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                            className="absolute right-0 top-8 w-44 bg-white rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-100 py-2 z-50 font-bold text-[13px] overflow-hidden"
+                          >
                             <Link 
                               href={`/assignments/${a._id}`}
                               onClick={(e) => e.stopPropagation()}
@@ -245,18 +271,34 @@ export default function AssignmentsPage() {
                               Rename
                             </button>
                             <button 
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                setOpenDropdownId(null);
+                                try {
+                                  await api.archiveAssignment(a._id);
+                                  toast.success('Assignment archived');
+                                  fetchAssignments();
+                                } catch (err) { toast.error('Failed to archive assignment'); }
+                              }}
+                              className="w-full text-left px-5 py-2.5 hover:bg-gray-50 text-gray-800 transition-colors"
+                            >
+                              Archive
+                            </button>
+                            <button 
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setOpenDropdownId(null);
                                 handleDelete(a._id);
+                                toast.success('Assignment moved to bin');
                               }}
                               className="w-full text-left px-5 py-2.5 hover:bg-red-50 text-red-500 transition-colors"
                             >
                               Delete
                             </button>
-                          </div>
+                          </motion.div>
                         </>
                       )}
+                      </AnimatePresence>
                     </div>
                   </div>
                   
@@ -264,9 +306,9 @@ export default function AssignmentsPage() {
                     <span className="font-extrabold text-[#1a1a1a] whitespace-nowrap">Assigned on : <span className="text-gray-500 font-medium ml-0.5">{new Date(a.createdAt).toLocaleDateString('en-GB').replace(/\//g, '-')}</span></span>
                     <span className="font-extrabold text-[#1a1a1a] whitespace-nowrap">Due : <span className="text-gray-500 font-medium ml-0.5">21-06-2025</span></span>
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </div>
       )}

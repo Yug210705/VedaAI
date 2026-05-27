@@ -35,6 +35,8 @@ export interface IAssignment extends Document {
   generatedQuestions?: any[];
   submittedCount: number;
   totalCount: number;
+  isArchived: boolean;
+  isDeleted: boolean;
   createdAt: Date;
 }
 
@@ -79,6 +81,8 @@ const AssignmentSchema = new Schema<IAssignment>({
   generatedQuestions: { type: [Schema.Types.Mixed], default: [] },
   submittedCount: { type: Number, default: 0 },
   totalCount: { type: Number, default: 50 },
+  isArchived: { type: Boolean, default: false },
+  isDeleted: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
 

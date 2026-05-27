@@ -21,19 +21,23 @@ body {
   overflow-x: hidden;
 }
 
-/* Custom scrollbar */
+/* Hide scrollbar globally but allow scrolling */
 ::-webkit-scrollbar {
-  width: 6px;
+  display: none;
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
-::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
+
+/* Utility class for explicit usage */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 .gradient-btn {

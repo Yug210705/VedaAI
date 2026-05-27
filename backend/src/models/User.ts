@@ -7,6 +7,9 @@ export interface IUser extends Document {
   role: string;
   timezone: string;
   status: string;
+  department?: string;
+  phoneNumber?: string;
+  bio?: string;
 }
 
 const UserSchema: Schema = new Schema({
@@ -15,7 +18,10 @@ const UserSchema: Schema = new Schema({
   avatarUrl: { type: String, default: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Default' },
   role: { type: String, default: 'Teacher' },
   timezone: { type: String, default: 'Asia/Kolkata (IST)' },
-  status: { type: String, default: 'Active' }
+  status: { type: String, default: 'Active' },
+  department: { type: String, default: '' },
+  phoneNumber: { type: String, default: '' },
+  bio: { type: String, default: '' }
 });
 
 export default mongoose.model<IUser>('User', UserSchema);

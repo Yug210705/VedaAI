@@ -5,6 +5,7 @@ import Topbar from '@/components/Topbar';
 import { 
   MoreVertical, Users, TrendingUp, Plus, ChevronRight, BookOpen, GraduationCap, Clock, Edit2, Archive, Trash2
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/components/Toaster';
@@ -122,12 +123,24 @@ export default function MyClassesPage() {
         </div>
 
         {/* Classes Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <motion.div 
+          initial="hidden" animate="show"
+          variants={{
+            hidden: { opacity: 0 },
+            show: { opacity: 1, transition: { staggerChildren: 0.08 } }
+          }}
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
+        >
           {classes.map((cls) => (
-            <div 
+            <motion.div 
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 350, damping: 25 } }
+              }}
+              whileHover={{ y: -6, boxShadow: '0 20px 40px rgba(0,0,0,0.06)' }}
               key={cls._id || cls.id}
               onClick={() => router.push(`/classes/${cls._id || cls.id}`)}
-              className="bg-white rounded-[24px] p-6 shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-gray-100 flex flex-col h-[240px] hover:shadow-[0_8px_32px_rgba(0,0,0,0.04)] transition-all cursor-pointer relative group dropdown-container"
+              className="bg-white rounded-[24px] p-6 shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-gray-100 flex flex-col h-[240px] cursor-pointer relative group dropdown-container"
             >
               {/* Header */}
               <div className="flex justify-between items-start mb-5">
@@ -151,8 +164,15 @@ export default function MyClassesPage() {
                     <MoreVertical className="w-[18px] h-[18px]" />
                   </button>
                   
+                  <AnimatePresence>
                   {activeDropdown === (cls._id || cls.id) && (
-                    <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-100 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                      className="absolute right-0 top-full mt-1 w-40 bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-100 py-1.5 z-50"
+                    >
                       <button 
                         onClick={(e) => {
                           e.preventDefault();
@@ -165,11 +185,15 @@ export default function MyClassesPage() {
                         <Edit2 className="w-3.5 h-3.5" /> Edit Class
                       </button>
                       <button 
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.preventDefault();
                           e.stopPropagation();
                           setActiveDropdown(null);
-                          toast.success('Class archived');
+                          try {
+                            await api.archiveClass(cls._id || cls.id);
+                            toast.success('Class archived');
+                            fetchClasses();
+                          } catch (err) { toast.error('Failed to archive class'); }
                         }}
                         className="w-full text-left px-4 py-2 hover:bg-gray-50 text-[13px] font-semibold text-gray-700 flex items-center gap-2"
                       >
@@ -182,7 +206,7 @@ export default function MyClassesPage() {
                           setActiveDropdown(null);
                           try {
                             await api.deleteClass(cls._id || cls.id);
-                            toast.success('Class deleted');
+                            toast.success('Class moved to bin');
                             fetchClasses();
                           } catch (err) {
                             toast.error('Failed to delete class');
@@ -192,8 +216,9 @@ export default function MyClassesPage() {
                       >
                         <Trash2 className="w-3.5 h-3.5" /> Delete
                       </button>
-                    </div>
+                    </motion.div>
                   )}
+                  </AnimatePresence>
                 </div>
               </div>
 
@@ -242,9 +267,9 @@ export default function MyClassesPage() {
                   Upcoming
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         </div>
       </div>
