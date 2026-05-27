@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Topbar from '@/components/Topbar';
 import { Plus, Search, MoreVertical, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { api } from '@/lib/api';
+import { api, WS_URL } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/components/Toaster';
 
@@ -46,7 +46,7 @@ export default function AssignmentsPage() {
 
     // WebSocket for real-time status updates
     try {
-      const ws = new WebSocket('ws://localhost:5000');
+      const ws = new WebSocket(WS_URL);
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);

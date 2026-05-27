@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Topbar from '@/components/Topbar';
 import { UploadCloud, Calendar, Plus, X, Mic, ArrowRight, ArrowLeft, Loader2, Download, Save, ChevronDown } from 'lucide-react';
 import { useAssignmentStore } from '@/store/useStore';
-import { api } from '@/lib/api';
+import { api, WS_URL } from '@/lib/api';
 import clsx from 'clsx';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -169,7 +169,7 @@ export default function CreateAssignment() {
 
   useEffect(() => {
     if (step === 2 && createdAssignmentId) {
-      const ws = new WebSocket('ws://localhost:5001');
+      const ws = new WebSocket(WS_URL);
       ws.onmessage = async (event) => {
         try {
           const data = JSON.parse(event.data);

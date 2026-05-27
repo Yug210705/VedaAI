@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { api, WS_URL } from '@/lib/api';
 import Topbar from '@/components/Topbar';
 import { Download, ChevronLeft, ChevronRight, CheckCircle2, XCircle } from 'lucide-react';
 import clsx from 'clsx';
@@ -24,7 +24,7 @@ export default function AssignmentOutput() {
     fetchAssignment();
     
     // Check for WebSocket updates to auto-refresh if it was generating
-    const ws = new WebSocket('ws://localhost:5000');
+    const ws = new WebSocket(WS_URL);
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === 'GENERATION_COMPLETED' && data.assignmentId === id) {

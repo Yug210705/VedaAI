@@ -1,5 +1,6 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
+export const WS_URL = API_URL.replace('http', 'ws').replace('/api', '');
 export const api = {
   getAssignments: async () => {
     const res = await fetch(`${API_URL}/assignments`);
