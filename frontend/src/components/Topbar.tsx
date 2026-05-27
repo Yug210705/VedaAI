@@ -353,25 +353,25 @@ export default function Topbar({ title, showBack = false }: TopbarProps) {
       </Modal>
 
       <Modal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} title="Settings" maxWidth="max-w-2xl">
-        <div className="flex gap-6 h-[400px]">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 h-auto md:h-[400px] max-h-[80vh] overflow-hidden">
           {/* Tabs */}
-          <div className="w-[180px] shrink-0 border-r border-gray-100 pr-4 space-y-1">
-            <div className="bg-gray-100 text-[#1a1a1a] font-bold px-3 py-2.5 rounded-lg text-[13px] flex items-center gap-2">
+          <div className="w-full md:w-[180px] shrink-0 border-b md:border-b-0 md:border-r border-gray-100 pb-3 md:pb-0 md:pr-4 flex md:flex-col gap-2 md:gap-1 overflow-x-auto hide-scrollbar">
+            <div className="bg-gray-100 text-[#1a1a1a] font-bold px-3 py-2.5 rounded-lg text-[13px] flex items-center gap-2 shrink-0">
               <User className="w-4 h-4" /> Account
             </div>
-            <div className="text-gray-500 hover:bg-gray-50 font-semibold px-3 py-2.5 rounded-lg text-[13px] flex items-center gap-2 cursor-pointer transition-colors">
+            <div className="text-gray-500 hover:bg-gray-50 font-semibold px-3 py-2.5 rounded-lg text-[13px] flex items-center gap-2 cursor-pointer transition-colors shrink-0">
               <Bell className="w-4 h-4" /> Notifications
             </div>
-            <div className="text-gray-500 hover:bg-gray-50 font-semibold px-3 py-2.5 rounded-lg text-[13px] flex items-center gap-2 cursor-pointer transition-colors">
+            <div className="text-gray-500 hover:bg-gray-50 font-semibold px-3 py-2.5 rounded-lg text-[13px] flex items-center gap-2 cursor-pointer transition-colors shrink-0">
               <Shield className="w-4 h-4" /> Privacy
             </div>
-            <div className="text-gray-500 hover:bg-gray-50 font-semibold px-3 py-2.5 rounded-lg text-[13px] flex items-center gap-2 cursor-pointer transition-colors">
+            <div className="text-gray-500 hover:bg-gray-50 font-semibold px-3 py-2.5 rounded-lg text-[13px] flex items-center gap-2 cursor-pointer transition-colors shrink-0">
               <Smartphone className="w-4 h-4" /> Devices
             </div>
           </div>
           
           {/* Content */}
-          <div className="flex-1 overflow-y-auto pr-2">
+          <div className="flex-1 overflow-y-auto pr-2 pb-4 md:pb-0 pt-1 md:pt-0">
             <h3 className="font-extrabold text-[18px] text-[#1a1a1a] mb-6">Account Settings</h3>
             
             {user && (
