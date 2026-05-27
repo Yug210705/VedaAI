@@ -1,0 +1,19 @@
+TypeError: pdf is not a function
+TypeError: pdf is not a function
+    at <anonymous> (C:\Users\Yug Pathak\Desktop\vedaai\backend\src\routes\assignments.ts:98:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)Error: Failed to find JSON array in fallback response: [
+  {
+    "text": "What is the meaning of the refractive index of diamond being 2.42?",
+    "type": "Short Questions",
+    "marks": 2,
+    "difficulty": "Easy",
+    "answer": "The refractive index of diamond (2.42
+Error: Failed to find JSON array in fallback response: [
+  {
+    "text": "What is the meaning of the refractive index of diamond being 2.42?",
+    "type": "Short Questions",
+    "marks": 2,
+    "difficulty": "Easy",
+    "answer": "The refractive index of diamond (2.42
+    at <anonymous> (C:\Users\Yug Pathak\Desktop\vedaai\backend\src\routes\assignments.ts:150:29)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
