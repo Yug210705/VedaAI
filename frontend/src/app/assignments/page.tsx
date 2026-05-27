@@ -7,6 +7,7 @@ import { Plus, Search, MoreVertical, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import { toast } from '@/components/Toaster';
 
 export default function AssignmentsPage() {
   const [assignments, setAssignments] = useState<any[]>([]);
