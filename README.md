@@ -41,7 +41,7 @@ VedaAI is built on a scalable, decoupled architecture to ensure maximum performa
 
 <div align="center">
   <!-- Place your MongoDB/Redis Metrics Screenshots here -->
-  <img src="./docs/dashboard-preview.png" alt="VedaAI Dashboard" width="800" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.1);" />
+  <img src="./docs/dashboard.png" alt="VedaAI Dashboard" width="800" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.1);" />
   <p><i>The highly polished, fully responsive VedaAI Dashboard.</i></p>
 </div>
 
