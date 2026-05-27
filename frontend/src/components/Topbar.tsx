@@ -15,6 +15,159 @@ interface TopbarProps {
   showBack?: boolean;
 }
 
+function SettingsContent({ user, api, toast, onClose, fetchData }: { user: any; api: any; toast: any; onClose: () => void; fetchData: () => void }) {
+  const [activeTab, setActiveTab] = useState('account');
+
+  const tabs = [
+    { id: 'account', label: 'Account', icon: User },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'privacy', label: 'Privacy', icon: Shield },
+    { id: 'devices', label: 'Devices', icon: Smartphone },
+  ];
+
+  return (
+    <div className="flex flex-col md:flex-row gap-0 md:gap-6 h-auto md:h-[420px] max-h-[75vh] overflow-hidden -mx-6 -mb-6 md:mx-0 md:mb-0">
+      {/* Tabs - horizontal scroll on mobile, vertical sidebar on desktop */}
+      <div className="w-full md:w-[180px] shrink-0 border-b md:border-b-0 md:border-r border-gray-100 bg-[#fafafa] md:bg-transparent px-4 md:px-0 md:pr-4 py-3 md:py-0 flex md:flex-col gap-1.5 md:gap-1 overflow-x-auto hide-scrollbar">
+        {tabs.map((tab) => {
+          const TabIcon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={clsx(
+                "font-semibold px-4 md:px-3 py-2.5 rounded-xl md:rounded-lg text-[13px] flex items-center gap-2 cursor-pointer transition-all duration-200 shrink-0 whitespace-nowrap",
+                activeTab === tab.id
+                  ? "bg-[#1a1a1a] text-white shadow-sm md:bg-gray-100 md:text-[#1a1a1a] md:shadow-none md:font-bold"
+                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              )}
+            >
+              <TabIcon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto px-5 md:px-2 pb-6 md:pb-0 pt-5 md:pt-0">
+        {activeTab === 'account' && (
+          <div>
+            <h3 className="font-extrabold text-[18px] text-[#1a1a1a] mb-6">Account Settings</h3>
+            {user && (
+              <form className="space-y-5" onSubmit={async (e: React.FormEvent) => {
+                e.preventDefault();
+                const formData = new FormData(e.target as HTMLFormElement);
+                try {
+                  await api.updateUser({
+                    displayName: formData.get('displayName'),
+                    email: formData.get('email')
+                  });
+                  onClose();
+                  toast.success('Settings saved successfully');
+                  fetchData();
+                } catch (err) {
+                  toast.error('Failed to update settings');
+                }
+              }}>
+                <div>
+                  <label className="block text-[12px] font-bold text-gray-500 uppercase tracking-wider mb-2">Display Name</label>
+                  <input name="displayName" type="text" defaultValue={user.displayName} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-[14px] font-medium focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 bg-white" />
+                </div>
+                <div>
+                  <label className="block text-[12px] font-bold text-gray-500 uppercase tracking-wider mb-2">Email Address</label>
+                  <input name="email" type="email" defaultValue={user.email} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-[14px] font-medium focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 bg-white" />
+                </div>
+                <div className="pt-4 border-t border-gray-100">
+                  <button type="submit" className="w-full md:w-auto bg-[#1c1c1c] text-white font-bold text-[13px] px-6 py-3 rounded-full hover:bg-black transition-colors">
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'notifications' && (
+          <div>
+            <h3 className="font-extrabold text-[18px] text-[#1a1a1a] mb-6">Notification Preferences</h3>
+            <div className="space-y-4">
+              {[
+                { label: 'Assignment Alerts', desc: 'Get notified when new assignments are created or updated' },
+                { label: 'Student Updates', desc: 'Receive alerts about student activity and submissions' },
+                { label: 'AI Generation Complete', desc: 'Notify when AI finishes generating content' },
+                { label: 'Weekly Summary', desc: 'Receive a weekly digest of all platform activity' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center justify-between p-4 bg-[#f8f9fa] rounded-2xl hover:bg-gray-100 transition-colors">
+                  <div className="flex-1 mr-4">
+                    <p className="text-[14px] font-bold text-[#1a1a1a]">{item.label}</p>
+                    <p className="text-[12px] text-gray-500 font-medium mt-0.5">{item.desc}</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                    <input type="checkbox" defaultChecked={i < 2} className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1a1a1a]"></div>
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'privacy' && (
+          <div>
+            <h3 className="font-extrabold text-[18px] text-[#1a1a1a] mb-6">Privacy & Security</h3>
+            <div className="space-y-4">
+              <div className="p-4 bg-[#f8f9fa] rounded-2xl">
+                <p className="text-[14px] font-bold text-[#1a1a1a] mb-1">Data Collection</p>
+                <p className="text-[12px] text-gray-500 font-medium">We only collect data necessary to improve your experience. Your student data is encrypted and never shared.</p>
+              </div>
+              <div className="p-4 bg-[#f8f9fa] rounded-2xl">
+                <p className="text-[14px] font-bold text-[#1a1a1a] mb-1">AI Data Usage</p>
+                <p className="text-[12px] text-gray-500 font-medium">Documents uploaded for AI processing are deleted immediately after generation. They are not stored or used for training.</p>
+              </div>
+              <div className="p-4 bg-red-50 rounded-2xl border border-red-100">
+                <p className="text-[14px] font-bold text-red-600 mb-1">Danger Zone</p>
+                <p className="text-[12px] text-red-500 font-medium mb-3">Permanently delete your account and all associated data.</p>
+                <button className="px-4 py-2 bg-red-500 text-white text-[12px] font-bold rounded-full hover:bg-red-600 transition-colors">Delete Account</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'devices' && (
+          <div>
+            <h3 className="font-extrabold text-[18px] text-[#1a1a1a] mb-6">Active Devices</h3>
+            <div className="space-y-3">
+              {[
+                { name: 'Chrome on Windows', location: 'Current Session', active: true },
+                { name: 'Safari on iPhone', location: 'Last active 2h ago', active: false },
+                { name: 'Firefox on MacOS', location: 'Last active 3 days ago', active: false },
+              ].map((device, i) => (
+                <div key={i} className="flex items-center justify-between p-4 bg-[#f8f9fa] rounded-2xl hover:bg-gray-100 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className={clsx("w-10 h-10 rounded-xl flex items-center justify-center", device.active ? "bg-green-100" : "bg-gray-200")}>
+                      <Smartphone className={clsx("w-5 h-5", device.active ? "text-green-600" : "text-gray-500")} />
+                    </div>
+                    <div>
+                      <p className="text-[14px] font-bold text-[#1a1a1a]">{device.name}</p>
+                      <p className="text-[12px] text-gray-500 font-medium">{device.location}</p>
+                    </div>
+                  </div>
+                  {device.active ? (
+                    <span className="text-[11px] font-bold text-green-600 bg-green-100 px-3 py-1 rounded-full">Active</span>
+                  ) : (
+                    <button className="text-[12px] font-bold text-red-500 hover:text-red-600 transition-colors">Revoke</button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Topbar({ title, showBack = false }: TopbarProps) {
   const router = useRouter();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -353,65 +506,7 @@ export default function Topbar({ title, showBack = false }: TopbarProps) {
       </Modal>
 
       <Modal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} title="Settings" maxWidth="max-w-2xl">
-        <div className="flex flex-col md:flex-row gap-4 md:gap-6 h-auto md:h-[400px] max-h-[80vh] overflow-hidden">
-          {/* Tabs */}
-          <div className="w-full md:w-[180px] shrink-0 border-b md:border-b-0 md:border-r border-gray-100 pb-3 md:pb-0 md:pr-4 flex md:flex-col gap-2 md:gap-1 overflow-x-auto hide-scrollbar">
-            <div className="bg-gray-100 text-[#1a1a1a] font-bold px-3 py-2.5 rounded-lg text-[13px] flex items-center gap-2 shrink-0">
-              <User className="w-4 h-4" /> Account
-            </div>
-            <div className="text-gray-500 hover:bg-gray-50 font-semibold px-3 py-2.5 rounded-lg text-[13px] flex items-center gap-2 cursor-pointer transition-colors shrink-0">
-              <Bell className="w-4 h-4" /> Notifications
-            </div>
-            <div className="text-gray-500 hover:bg-gray-50 font-semibold px-3 py-2.5 rounded-lg text-[13px] flex items-center gap-2 cursor-pointer transition-colors shrink-0">
-              <Shield className="w-4 h-4" /> Privacy
-            </div>
-            <div className="text-gray-500 hover:bg-gray-50 font-semibold px-3 py-2.5 rounded-lg text-[13px] flex items-center gap-2 cursor-pointer transition-colors shrink-0">
-              <Smartphone className="w-4 h-4" /> Devices
-            </div>
-          </div>
-          
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto pr-2 pb-4 md:pb-0 pt-1 md:pt-0">
-            <h3 className="font-extrabold text-[18px] text-[#1a1a1a] mb-6">Account Settings</h3>
-            
-            {user && (
-            <form className="space-y-5" onSubmit={async (e) => {
-              e.preventDefault();
-              const formData = new FormData(e.target as HTMLFormElement);
-              try {
-                await api.updateUser({
-                  displayName: formData.get('displayName'),
-                  email: formData.get('email')
-                });
-                setIsSettingsOpen(false);
-                toast.success('Settings saved successfully');
-                fetchData();
-              } catch (err) {
-                toast.error('Failed to update settings');
-              }
-            }}>
-              <div>
-                <label className="block text-[12px] font-bold text-gray-500 uppercase tracking-wider mb-2">Display Name</label>
-                <input name="displayName" type="text" defaultValue={user.displayName} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-[14px] font-medium focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" />
-              </div>
-              
-              <div>
-                <label className="block text-[12px] font-bold text-gray-500 uppercase tracking-wider mb-2">Email Address</label>
-                <input name="email" type="email" defaultValue={user.email} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-[14px] font-medium focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" />
-              </div>
-              
-              <div className="pt-4 border-t border-gray-100">
-                <button 
-                  type="submit"
-                  className="bg-[#1c1c1c] text-white font-bold text-[13px] px-6 py-3 rounded-full hover:bg-black transition-colors"
-                >
-                  Save Changes
-                </button>
-              </div>
-            </form>
-            )}
-          </div>
-        </div>
+        <SettingsContent user={user} api={api} toast={toast} onClose={() => setIsSettingsOpen(false)} fetchData={fetchData} />
       </Modal>
     </>
   );

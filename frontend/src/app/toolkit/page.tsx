@@ -292,7 +292,7 @@ export default function ToolkitPage() {
       <Topbar title="AI Toolkit" showBack={false} />
       
       <div className="flex-1 flex flex-col relative bg-[#f8f9fa] md:mx-3 md:rounded-[24px] overflow-hidden md:shadow-sm md:border border-gray-100">
-        <div className="flex-1 overflow-y-auto hide-scrollbar px-4 md:px-8 xl:px-12 pt-4 md:pt-6 pb-24 flex flex-col items-center">
+        <div className="flex-1 overflow-y-auto hide-scrollbar px-4 md:px-8 xl:px-12 pt-4 md:pt-6 pb-[140px] md:pb-24 flex flex-col items-center">
         
         {/* Vibrant Mesh Header */}
         <div className="w-full max-w-[1200px] rounded-[32px] mb-6 md:mb-8 relative overflow-hidden bg-[#1a1a1a] shadow-[0_20px_60px_rgba(0,0,0,0.15)] group">
@@ -301,16 +301,16 @@ export default function ToolkitPage() {
           <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-[#4ca1af]/30 to-[#2c3e50]/30 rounded-full blur-[80px] translate-y-1/3 -translate-x-1/4 group-hover:scale-110 transition-transform duration-1000 delay-100"></div>
           
           {/* Glassmorphic Overlay */}
-          <div className="relative z-10 w-full p-10 md:p-14 bg-white/5 backdrop-blur-[2px] border border-white/10">
+          <div className="relative z-10 w-full p-6 md:p-14 bg-white/5 backdrop-blur-[2px] border border-white/10">
             <div className="max-w-2xl relative">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white font-black text-[11px] uppercase tracking-[0.2em] mb-6 shadow-sm backdrop-blur-md">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white font-black text-[11px] uppercase tracking-[0.2em] mb-4 md:mb-6 shadow-sm backdrop-blur-md">
                 <Sparkles className="w-4 h-4 text-[#ff512f]" /> 
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">Beta Features</span>
               </div>
-              <h1 className="text-[36px] md:text-[48px] font-black text-white tracking-tight leading-[1.1] mb-5">
+              <h1 className="text-[28px] md:text-[48px] font-black text-white tracking-tight leading-[1.1] mb-3 md:mb-5">
                 Teacher&apos;s <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff512f] to-[#f89b53]">AI Toolkit</span>
               </h1>
-              <p className="text-[15px] md:text-[18px] text-gray-300 font-medium leading-relaxed max-w-xl">
+              <p className="text-[13px] md:text-[18px] text-gray-300 font-medium leading-relaxed max-w-xl">
                 Supercharge your workflow. Instantly draft emails, create rubrics, and generate lesson plans with our suite of specialized AI assistants designed specifically for educators.
               </p>
             </div>
@@ -327,7 +327,7 @@ export default function ToolkitPage() {
             hidden: { opacity: 0 },
             show: { opacity: 1, transition: { staggerChildren: 0.1 } }
           }}
-          className="w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+          className="w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
         >
           {TOOLS.map((tool) => {
             const Icon = tool.icon;
@@ -341,33 +341,33 @@ export default function ToolkitPage() {
                 key={tool.id}
                 onClick={() => openTool(tool)}
                 className={clsx(
-                  "relative bg-white rounded-[32px] p-8 border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] cursor-pointer group transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] hover:border-gray-200 flex flex-col overflow-hidden",
+                  "relative bg-white rounded-[32px] p-5 md:p-8 border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] cursor-pointer group transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] hover:border-gray-200 flex flex-col overflow-hidden",
                   tool.glow
                 )}
               >
                 {/* Subtle background glow on hover */}
                 <div className={clsx("absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 bg-gradient-to-br", tool.gradient)}></div>
 
-                <div className="flex items-start justify-between mb-8 relative z-10">
+                <div className="flex items-start justify-between mb-5 md:mb-8 relative z-10">
                   <div className="relative">
                     {/* Glowing background behind icon */}
                     <div className={clsx("absolute inset-0 blur-xl opacity-40 group-hover:opacity-80 transition-opacity duration-500 rounded-full", tool.iconBg)}></div>
-                    <div className={clsx("w-16 h-16 rounded-[20px] flex items-center justify-center relative z-10 shadow-sm transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 bg-gradient-to-br", tool.gradient)}>
-                      <Icon className="w-7 h-7 text-white" strokeWidth={2.5} />
+                    <div className={clsx("w-12 h-12 md:w-16 md:h-16 rounded-[16px] md:rounded-[20px] flex items-center justify-center relative z-10 shadow-sm transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 bg-gradient-to-br", tool.gradient)}>
+                      <Icon className="w-5 h-5 md:w-7 md:h-7 text-white" strokeWidth={2.5} />
                     </div>
                   </div>
                   
-                  <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-[#1a1a1a] transition-all duration-500 shadow-sm border border-gray-100 group-hover:border-black group-hover:shadow-md">
-                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors duration-500 transform group-hover:translate-x-0.5" />
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-[#1a1a1a] transition-all duration-500 shadow-sm border border-gray-100 group-hover:border-black group-hover:shadow-md">
+                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-white transition-colors duration-500 transform group-hover:translate-x-0.5" />
                   </div>
                 </div>
                 
                 <div className="relative z-10 flex flex-col flex-1">
                   <div className="flex items-center flex-wrap gap-2 mb-3">
-                    <h3 className="font-extrabold text-[22px] text-[#1a1a1a] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-gray-900 group-hover:to-gray-600 transition-all duration-300 tracking-tight">{tool.title}</h3>
+                    <h3 className="font-extrabold text-[18px] md:text-[22px] text-[#1a1a1a] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-gray-900 group-hover:to-gray-600 transition-all duration-300 tracking-tight">{tool.title}</h3>
                     <div className={clsx("px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase bg-gradient-to-r text-white shadow-sm opacity-90", tool.gradient)}>Beta</div>
                   </div>
-                  <p className="text-[15px] text-gray-500 font-medium leading-relaxed flex-1">
+                  <p className="text-[13px] md:text-[15px] text-gray-500 font-medium leading-relaxed flex-1">
                     {tool.description}
                   </p>
                 </div>
@@ -388,14 +388,14 @@ export default function ToolkitPage() {
                {/* Decorative Gradient in Modal Header */}
                <div className={clsx("absolute top-0 left-0 w-[400px] h-[400px] rounded-full blur-[80px] -translate-y-1/2 -translate-x-1/2 opacity-30 bg-gradient-to-br", activeTool.gradient)}></div>
                
-               <div className={clsx("px-8 py-8 border-b border-white/10 flex items-center justify-between relative z-10")}>
+               <div className={clsx("px-5 py-5 md:px-8 md:py-8 border-b border-white/10 flex items-center justify-between relative z-10")}>
                  <div className="flex items-center gap-5">
-                   <div className={clsx("w-14 h-14 rounded-[18px] flex items-center justify-center shadow-lg bg-gradient-to-br", activeTool.gradient)}>
-                      <activeTool.icon className="w-7 h-7 text-white" strokeWidth={2.5} />
+                   <div className={clsx("w-10 h-10 md:w-14 md:h-14 rounded-[14px] md:rounded-[18px] flex items-center justify-center shadow-lg bg-gradient-to-br", activeTool.gradient)}>
+                      <activeTool.icon className="w-5 h-5 md:w-7 md:h-7 text-white" strokeWidth={2.5} />
                    </div>
                    <div>
-                     <h2 className="font-black text-[24px] text-white tracking-tight">{activeTool.title}</h2>
-                     <p className="text-[13px] font-medium text-gray-400">{activeTool.description}</p>
+                     <h2 className="font-black text-[18px] md:text-[24px] text-white tracking-tight">{activeTool.title}</h2>
+                     <p className="text-[12px] md:text-[13px] font-medium text-gray-400">{activeTool.description}</p>
                    </div>
                  </div>
                  <button onClick={closeTool} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors">
@@ -405,7 +405,7 @@ export default function ToolkitPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="p-8 md:p-10 overflow-y-auto flex-1 bg-white">
+            <div className="p-5 md:p-10 overflow-y-auto flex-1 bg-white">
               
               {!output && !generating && (
                 <form id="tool-form" onSubmit={handleGenerate} className="space-y-6">
@@ -474,23 +474,23 @@ export default function ToolkitPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-8 py-5 border-t border-gray-100 bg-white flex justify-end gap-4 shrink-0">
+            <div className="px-5 py-4 md:px-8 md:py-5 border-t border-gray-100 bg-white flex flex-col-reverse md:flex-row justify-end gap-3 md:gap-4 shrink-0">
                {!output && !generating && (
                  <>
-                   <button type="button" onClick={closeTool} className="px-6 py-3 rounded-full font-bold text-[14px] text-gray-500 hover:bg-gray-100 transition-colors">
+                   <button type="button" onClick={closeTool} className="px-6 py-3 rounded-full font-bold text-[14px] text-gray-500 hover:bg-gray-100 transition-colors flex-1 md:flex-initial text-center">
                      Cancel
                    </button>
-                   <button type="submit" form="tool-form" className="px-8 py-3 rounded-full font-bold text-[14px] text-white bg-[#1a1a1a] hover:bg-black transition-all shadow-[0_6px_20px_rgba(0,0,0,0.15)] flex items-center gap-2 hover:-translate-y-0.5 active:scale-95">
+                   <button type="submit" form="tool-form" className="px-8 py-3 rounded-full font-bold text-[14px] text-white bg-[#1a1a1a] hover:bg-black transition-all shadow-[0_6px_20px_rgba(0,0,0,0.15)] flex items-center gap-2 hover:-translate-y-0.5 active:scale-95 flex-1 md:flex-initial justify-center">
                      <Sparkles className="w-4 h-4" /> Generate
                    </button>
                  </>
                )}
                {output && !generating && (
                  <>
-                   <button type="button" onClick={() => { setOutput(null); setFormData({}); }} className="px-6 py-3 rounded-full font-bold text-[14px] text-gray-500 hover:bg-gray-100 transition-colors">
+                   <button type="button" onClick={() => { setOutput(null); setFormData({}); }} className="px-6 py-3 rounded-full font-bold text-[14px] text-gray-500 hover:bg-gray-100 transition-colors flex-1 md:flex-initial text-center">
                      Generate Another
                    </button>
-                   <button type="button" onClick={handleCopy} className={clsx("px-8 py-3 rounded-full font-bold text-[14px] text-white transition-all shadow-[0_6px_20px_rgba(0,0,0,0.15)] flex items-center gap-2 hover:-translate-y-0.5 active:scale-95", copied ? "bg-green-500 hover:bg-green-600" : "bg-[#1a1a1a] hover:bg-black")}>
+                   <button type="button" onClick={handleCopy} className={clsx("px-8 py-3 rounded-full font-bold text-[14px] text-white transition-all shadow-[0_6px_20px_rgba(0,0,0,0.15)] flex items-center gap-2 hover:-translate-y-0.5 active:scale-95 flex-1 md:flex-initial justify-center", copied ? "bg-green-500 hover:bg-green-600" : "bg-[#1a1a1a] hover:bg-black")}>
                      {copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />} 
                      {copied ? 'Copied!' : 'Copy to Clipboard'}
                    </button>
