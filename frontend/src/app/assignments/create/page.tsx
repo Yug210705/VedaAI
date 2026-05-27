@@ -458,6 +458,15 @@ export default function CreateAssignment() {
           </div>
       )}
 
+      {step === 2 && (
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center min-h-[400px]">
+          <div className="w-12 h-12 md:w-16 md:h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+          <h2 className="text-[20px] md:text-2xl font-bold text-[#1a1a1a] mb-2">Generating Question Paper...</h2>
+          <p className="text-[13px] md:text-[15px] text-gray-500 max-w-md font-medium leading-relaxed">
+            Our AI is currently analyzing your requirements and crafting the perfect questions. This usually takes about 10-20 seconds. Please do not close this page.
+          </p>
+        </div>
+      )}
       {step === 3 && (
         <div className="flex-1 flex flex-col items-center overflow-y-auto bg-gray-50 md:bg-[#eef0f3] pt-4 md:pt-10 pb-[140px] md:pb-24 px-3 md:px-0 relative md:ml-[11px] md:mr-4 md:rounded-[16px]">
           
