@@ -308,7 +308,7 @@ export default function CreateAssignment() {
                       <div className="relative">
                         <DatePicker
                           selected={store.dueDate ? new Date(store.dueDate) : null}
-                          onChange={(date) => {
+                          onChange={(date: Date | null) => {
                             if (date) {
                               const tzOffset = date.getTimezoneOffset() * 60000;
                               const localISOTime = (new Date(date.getTime() - tzOffset)).toISOString().split('T')[0];
