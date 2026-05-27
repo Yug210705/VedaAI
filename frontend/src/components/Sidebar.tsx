@@ -54,7 +54,7 @@ export default function Sidebar() {
     };
   }, []);
 
-  const navItems = [
+  const navItems: any[] = [
     { name: 'Home', href: '/', iconImg: homeImg.src },
     { name: 'My Classes', href: '/classes', iconImg: mygroupImg.src },
     { name: 'Assignments', href: '/assignments', iconImg: assignmentsImg.src },
