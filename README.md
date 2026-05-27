@@ -139,11 +139,11 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser to see Veda
 
 | Dashboard Overview | Assignment PDF Generation |
 | :---: | :---: |
-| `<img src="./docs/dashboard.png" width="400" />` | `<img src="./docs/pdf-export.png" width="400" />` |
+| <img src="./docs/dashboard.png" width="400" /> | <img src="./docs/pdf-export.png" width="400" /> |
 
 | MongoDB Atlas Analytics | Redis Cloud Queue Metrics |
 | :---: | :---: |
-| `<img src="./docs/mongo-metrics.png" width="400" />` | `<img src="./docs/redis-metrics.png" width="400" />` |
+| <img src="./docs/mongo-metrics.png" width="400" /> | <img src="./docs/redis-metrics.png" width="400" /> |
 
 ---
 
